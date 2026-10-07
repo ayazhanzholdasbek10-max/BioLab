@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BioLab — Interactive Biology</title>
+<style>
+:root{
+  --bg:#f5f7f4;--card:#fff;--ink:#17211b;--muted:#66736b;--line:#dce4de;
+  --accent:#287a59;--accent2:#e6f3ed;--warn:#9a6b18;--danger:#a53b3b;
+  --shadow:0 10px 30px rgba(23,33,27,.07);--r:18px;
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select{font:inherit}button{cursor:pointer}
+header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.nav{max-width:1180px;margin:auto;height:68px;display:flex;align-items:center;gap:24px;padding:0 20px}
+.logo{font-weight:850;letter-spacing:-.5px;font-size:20px}.logo span{color:var(--accent)}
+.navlinks{display:flex;gap:6px;margin-left:auto}.navlinks button,.iconbtn{border:0;background:transparent;padding:9px 12px;border-radius:10px;color:var(--muted)}.navlinks button:hover,.iconbtn:hover{background:var(--accent2);color:var(--accent)}
+main{max-width:1180px;margin:auto;padding:28px 20px 70px}
+.hero{display:grid;grid-template-columns:1.25fr .75fr;gap:24px;align-items:stretch;margin-bottom:26px}
+.heroText{padding:28px 0}.eyebrow{color:var(--accent);font-weight:750;font-size:13px;text-transform:uppercase;letter-spacing:.1em}
+h1{font-size:clamp(38px,6vw,66px);line-height:.98;letter-spacing:-2.5px;margin:12px 0 18px;max-width:750px}
+h2{font-size:28px;letter-spacing:-1px;margin:0 0 8px}h3{margin:0 0 8px}.lead{font-size:18px;line-height:1.6;color:var(--muted);max-width:700px}
+.btn{border:1px solid var(--line);background:#fff;padding:11px 15px;border-radius:11px;font-weight:700;color:var(--ink)}.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}.btn:hover{transform:translateY(-1px)}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.heroCard{background:linear-gradient(145deg,#183f31,#287a59);color:#fff;border-radius:24px;padding:24px;box-shadow:var(--shadow);display:flex;flex-direction:column;justify-content:space-between;min-height:270px}
+.heroCard .big{font-size:68px;font-weight:850;line-height:1}.heroCard p{color:#dceee6;line-height:1.5}.pill{display:inline-flex;width:max-content;border-radius:999px;padding:6px 10px;background:rgba(255,255,255,.14);font-size:12px;font-weight:700}
+.section{margin-top:30px}.sectionHead{display:flex;justify-content:space-between;gap:15px;align-items:end;margin-bottom:15px}.muted{color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow)}
+.topic{display:flex;flex-direction:column;min-height:180px}.topicIcon{font-size:30px}.topic p{color:var(--muted);line-height:1.45;margin:7px 0 16px}.topic .btn{margin-top:auto;width:max-content}
+.sim{display:grid;grid-template-columns:320px 1fr;gap:16px}.controls{position:sticky;top:88px;height:max-content}.field{margin:15px 0}.field label{display:flex;justify-content:space-between;font-size:13px;font-weight:750;margin-bottom:7px}.field input[type=range]{width:100%;accent-color:var(--accent)}select,.textInput{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+.canvas{min-height:420px;background:#fbfcfb;border:1px solid var(--line);border-radius:var(--r);padding:18px;position:relative;overflow:hidden}
+.status{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:14px}.badge{font-size:12px;padding:6px 9px;border-radius:999px;background:var(--accent2);color:var(--accent);font-weight:800}
+.neuron{height:250px;position:relative;margin:25px auto;max-width:800px}.axon{position:absolute;left:16%;right:13%;top:50%;height:30px;border-radius:20px;background:#d5ddd8;transform:translateY(-50%);border:1px solid #c8d2cc}
+.cell{position:absolute;width:95px;height:95px;border-radius:50%;left:4%;top:50%;transform:translateY(-50%);background:#d9eee4;border:3px solid #7bb69d;display:grid;place-items:center;font-size:34px}
+.node{position:absolute;width:14px;height:44px;top:50%;transform:translate(-50%,-50%);background:#fff;border:2px solid #a9b7af;border-radius:8px;z-index:2}.node.n1{left:29%}.node.n2{left:43%}.node.n3{left:57%}.node.n4{left:71%}.node.n5{left:85%}
+.signal{position:absolute;width:18px;height:18px;border-radius:50%;background:#f2bd50;box-shadow:0 0 0 7px rgba(242,189,80,.15);top:50%;left:8%;transform:translate(-50%,-50%);z-index:4;opacity:0}
+.signal.run{opacity:1;animation:travel 2.1s linear infinite}
+@keyframes travel{from{left:8%}to{left:88%}}
+.dendrite{position:absolute;width:85px;height:70px;left:0;top:10%;border-left:4px solid #7bb69d;border-radius:50%;transform:rotate(-20deg)}.dendrite.two{top:67%;transform:rotate(20deg)}
+.chart{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:20px}.metric{background:#f3f6f4;border-radius:12px;padding:12px}.metric strong{display:block;font-size:22px;margin-top:4px}
+.explain{margin-top:16px;background:var(--accent2);border:1px solid #cce6da;border-radius:14px;padding:15px;line-height:1.55}.explain strong{color:var(--accent)}
+.prediction{border-left:4px solid var(--accent);padding:10px 12px;background:#f8fbf9;border-radius:8px;margin-top:12px}
+.search{max-width:320px}.empty{padding:30px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:14px;grid-column:1/-1}
+.progress{height:8px;background:#e6ece8;border-radius:99px;overflow:hidden}.progress i{display:block;height:100%;width:0;background:var(--accent);transition:.4s}
+.quiz{display:grid;grid-template-columns:1fr 1fr;gap:14px}.option{text-align:left;width:100%;margin-top:8px}.option.correct{border-color:var(--accent);background:var(--accent2)}.option.wrong{border-color:#e8b6b6;background:#fff5f5}
+.toast{position:fixed;bottom:20px;right:20px;background:#17211b;color:#fff;padding:12px 15px;border-radius:11px;opacity:0;transform:translateY(10px);pointer-events:none;transition:.2s;z-index:30}.toast.show{opacity:1;transform:none}
+footer{max-width:1180px;margin:auto;padding:0 20px 40px;color:var(--muted);font-size:13px}
+@media(max-width:850px){.hero,.sim{grid-template-columns:1fr}.controls{position:static}.grid{grid-template-columns:1fr 1fr}.quiz{grid-template-columns:1fr}.navlinks{display:none}.heroText{padding-top:10px}}
+@media(max-width:560px){main{padding:18px 14px 50px}.nav{padding:0 14px}.grid{grid-template-columns:1fr}.chart{grid-template-columns:1fr 1fr}h1{letter-spacing:-1.7px}.canvas{min-height:370px}}
+</style>
+</head>
+<body>
+<header><nav class="nav">
+  <div class="logo">Bio<span>Lab</span></div>
+  <div class="navlinks">
+    <button data-scroll="topics">Explore</button><button data-scroll="simulator">Simulator</button><button data-scroll="quiz">Test yourself</button><button data-scroll="saved">Saved</button>
+  </div>
+  <button class="iconbtn" id="saveCurrent">☆ Save</button>
+</nav></header>
+
+<main>
+<section class="hero">
+  <div class="heroText">
+    <div class="eyebrow">Interactive biology laboratory</div>
+    <h1>Don't just watch biology. Experiment with it.</h1>
+    <p class="lead">Change a parameter, make a prediction, run a model and see how a biological system responds. Built as a classroom-friendly demonstration — not a clinical or research-grade simulator.</p>
+    <div class="actions"><button class="btn primary" data-scroll="topics">Start exploring</button><button class="btn" data-scroll="simulator">Open simulator</button></div>
+  </div>
+  <div class="heroCard"><span class="pill">Current model · Neural impulse</span><div class="big">Na⁺ → ⚡ → K⁺</div><p>Explore how ion movement changes membrane potential during an action potential.</p></div>
+</section>
+
+<section id="topics" class="section">
+  <div class="sectionHead"><div><h2>Choose a process</h2><div class="muted">Small models, clear cause-and-effect.</div></div><input id="topicSearch" class="textInput search" placeholder="Search processes…"></div>
+  <div id="topicGrid" class="grid"></div>
+</section>
+
+<section id="simulator" class="section">
+  <div class="sectionHead"><div><h2>Laboratory</h2><div class="muted">Make a prediction before running the model.</div></div><span class="badge" id="modelBadge">Neural impulse</span></div>
+  <div class="sim">
+    <div class="card controls">
+      <h3>Experiment</h3>
+      <div class="field"><label for="process">Process</label><select id="process"></select></div>
+      <div id="dynamicControls"></div>
+      <button class="btn primary" id="runBtn" style="width:100%">▶ Run simulation</button>
+      <button class="btn" id="resetBtn" style="width:100%;margin-top:8px">Reset</button>
+      <div class="prediction"><b>Your prediction</b><br><span id="predictionText">Set the variables and predict the result.</span></div>
+      <button class="btn" id="revealBtn" style="width:100%;margin-top:8px">Reveal model result</button>
+    </div>
+    <div class="canvas">
+      <div class="status"><strong id="canvasTitle">Action potential</strong><span id="runStatus" class="badge">Ready</span></div>
+      <div id="visual"></div>
+      <div class="chart" id="metrics"></div>
+      <div class="explain" id="explanation"><strong>How to use:</strong> Change a variable, write or think about your prediction, then run the simulation. The explanation updates from the model rules.</div>
+    </div>
+  </div>
+</section>
+
+<section id="quiz" class="section">
+  <div class="sectionHead"><div><h2>Check your understanding</h2><div class="muted">One question generated from the current model.</div></div><span class="badge" id="score">0 / 0</span></div>
+  <div class="card" id="quizCard"></div>
+</section>
+
+<section id="saved" class="section">
+  <div class="sectionHead"><div><h2>Saved experiments</h2><div class="muted">Saved only in this browser.</div></div><button class="btn" id="clearSaved">Clear all</button></div>
+  <div id="savedGrid" class="grid"></div>
+</section>
+</main>
+<footer>BioLab is an educational web demonstration. Simulation values and outcomes are simplified model data, not measurements from a real biological experiment.</footer>
+<div id="toast" class="toast"></div>
+
+<script>
+const models={
+ neuron:{
+  name:"Neural impulse",icon:"⚡",desc:"Model how ion conditions affect an action potential.",
+  controls:[
+   {id:"stimulus",label:"Stimulus strength",min:0,max:100,step:1,value:70,unit:"%",default:70},
+   {id:"sodium",label:"Relative Na⁺ availability",min:0,max:100,step:1,value:80,unit:"%",default:80},
+   {id:"potassium",label:"Relative K⁺ availability",min:0,max:100,step:1,value:70,unit:"%",default:70}
+  ],
+  run(v){let threshold=55, exc=Math.round(v.stimulus*.55+v.sodium*.3+v.potassium*.15);let fired=exc>=threshold;return{
+   title:fired?"Action potential generated":"Threshold not reached",
+   metrics:[["Excitation index",exc+"%"],["Threshold",threshold+"%"],["Signal",fired?"Propagates":"Fades"]],
+   explanation:fired?`The simplified model crosses its threshold because the combined stimulus and ion availability are sufficient. Na⁺ availability mainly supports the depolarizing phase; K⁺ availability supports repolarization.`:`The simplified model stays below threshold. A stronger stimulus or greater Na⁺ availability would increase the excitation index. This is a teaching model, not a physiological prediction.`,
+   anim:fired
+  }},
+ question(v,r){return{q:"In this simplified model, what is most directly needed to generate the signal?",opts:["Crossing the threshold","Removing all K⁺","Making the stimulus zero","Stopping ion movement"],ans:0}}
+ },
+ diffusion:{
+  name:"Membrane diffusion",icon:"🫧",desc:"See how concentration difference changes net particle movement.",
+  controls:[
+   {id:"outside",label:"Outside concentration",min:0,max:100,step:1,value:80,unit:"",default:80},
+   {id:"inside",label:"Inside concentration",min:0,max:100,step:1,value:20,unit:"",default:20},
+   {id:"permeability",label:"Membrane permeability",min:0,max:100,step:1,value:60,unit:"%",default:60}
+  ],
+  run(v){let gradient=v.outside-v.inside,rate=Math.round(Math.abs(gradient)*v.permeability/100);return{
+   title:gradient>0?"Net movement inward":"Net movement outward",
+   metrics:[["Concentration difference",Math.abs(gradient)+" units"],["Permeability",v.permeability+"%"],["Relative rate",rate+" units"]],
+   explanation:gradient===0?"There is no concentration gradient, so the model predicts no net directional movement.":`Particles move down the concentration gradient in this simplified model. A larger concentration difference and higher permeability produce a larger relative net movement.`,
+   anim:Math.abs(gradient)>5
+  }},
+ question(v,r){return{q:"What happens to net movement when the concentration difference becomes larger?",opts:["It generally increases","It always becomes zero","It reverses automatically","It becomes unrelated to permeability"],ans:0}}
+ },
+ osmosis:{
+  name:"Osmosis",icon:"💧",desc:"Explore how water movement responds to differences in solute concentration.",
+  controls:[
+   {id:"cellSolute",label:"Solute inside cell",min:0,max:100,step:1,value:35,unit:"%",default:35},
+   {id:"solutionSolute",label:"Solute outside cell",min:0,max:100,step:1,value:65,unit:"%",default:65},
+   {id:"permeability",label:"Water permeability",min:0,max:100,step:1,value:75,unit:"%",default:75}
+  ],
+  run(v){let d=v.solutionSolute-v.cellSolute,mag=Math.round(Math.abs(d)*v.permeability/100);let dir=d>3?"out of cell":d<-3?"into cell":"little net movement";return{
+   title:dir==="out of cell"?"Cell tends to lose water":dir==="into cell"?"Cell tends to gain water":"Near balance",
+   metrics:[["Solute difference",Math.abs(d)+"%"],["Water permeability",v.permeability+"%"],["Relative water shift",mag+""]],
+   explanation:`The model compares solute concentration across the membrane. Water tends to move toward the side with higher effective solute concentration. The result is simplified and does not represent every factor in real cells.`,
+   anim:mag>4
+  }},
+ question(v,r){return{q:"If the outside solution has much more solute than the cell, which direction does the model predict for water?",opts:["Out of the cell","Into the cell","No possible movement","Only solute moves"],ans:0}}
+ },
+ enzyme:{
+  name:"Enzyme activity",icon:"🧪",desc:"Explore how temperature and substrate affect a simplified enzyme rate.",
+  controls:[
+   {id:"temp",label:"Temperature",min:0,max:80,step:1,value:37,unit:"°C",default:37},
+   {id:"substrate",label:"Substrate availability",min:0,max:100,step:1,value:70,unit:"%",default:70},
+   {id:"enzyme",label:"Enzyme amount",min:0,max:100,step:1,value:60,unit:"%",default:60}
+  ],
+  run(v){let tempScore=Math.max(0,100-Math.abs(v.temp-37)*3.1),rate=Math.round(tempScore*.5+v.substrate*.25+v.enzyme*.25);return{
+   title:rate>70?"High relative activity":rate>40?"Moderate relative activity":"Low relative activity",
+   metrics:[["Temperature fit",Math.round(tempScore)+"%"],["Substrate",v.substrate+"%"],["Relative rate",rate+"%"]],
+   explanation:`This teaching model assumes an optimum near 37°C and reduces activity as temperature moves away from that point. More substrate or enzyme can raise the relative rate, but real enzyme kinetics are more complex.`,
+   anim:rate>40
+  }},
+ question(v,r){return{q:"In this simplified model, what temperature gives the highest temperature-fit score?",opts:["37°C","0°C","80°C","100°C"],ans:0}}
+ }
+};
+let current="neuron",lastResult=null,quizState=null,score=0,total=0;
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+function toast(t){let x=$("#toast");x.textContent=t;x.classList.add("show");setTimeout(()=>x.classList.remove("show"),1800)}
+function storageGet(){try{return JSON.parse(localStorage.getItem("biolab_saved")||"[]")}catch(e){return[]}}
+function storageSet(a){try{localStorage.setItem("biolab_saved",JSON.stringify(a));return true}catch(e){return false}}
+function renderTopics(filter=""){
+ let items=Object.entries(models).filter(([k,m])=>(m.name+" "+m.desc).toLowerCase().includes(filter.toLowerCase()));
+ $("#topicGrid").innerHTML=items.length?items.map(([k,m])=>`<article class="card topic"><div class="topicIcon">${m.icon}</div><h3>${m.name}</h3><p>${m.desc}</p><button class="btn" onclick="choose('${k}')">Open model</button></article>`).join(""):`<div class="empty">No matching processes. Try another search.</div>`;
+}
+function renderSelect(){let s=$("#process");s.innerHTML=Object.entries(models).map(([k,m])=>`<option value="${k}">${m.name}</option>`).join("");s.value=current}
+function renderControls(){
+ let m=models[current];$("#modelBadge").textContent=m.name;$("#canvasTitle").textContent=m.name;
+ $("#dynamicControls").innerHTML=m.controls.map(c=>`<div class="field"><label for="${c.id}"><span>${c.label}</span><span id="${c.id}Val">${c.value}${c.unit}</span></label><input id="${c.id}" type="range" min="${c.min}" max="${c.max}" step="${c.step}" value="${c.value}"></div>`).join("");
+ m.controls.forEach(c=>$("#"+c.id).addEventListener("input",e=>{ $("#"+c.id+"Val").textContent=e.target.value+c.unit; $("#predictionText").textContent="Variables changed — what do you expect to happen?"}));
+ drawIdle();
+}
+function values(){let m=models[current],o={};m.controls.forEach(c=>o[c.id]=Number($("#"+c.id).value));return o}
+function drawIdle(){let m=models[current];$("#visual").innerHTML=current==="neuron"?`<div class="neuron"><div class="dendrite"></div><div class="dendrite two"></div><div class="cell">🧠</div><div class="axon"></div><div class="node n1"></div><div class="node n2"></div><div class="node n3"></div><div class="node n4"></div><div class="node n5"></div><div class="signal"></div></div>`:`<div style="height:250px;display:grid;place-items:center;font-size:70px">${m.icon}</div>`;$("#metrics").innerHTML="";$("#runStatus").textContent="Ready";$("#explanation").innerHTML="<strong>How to use:</strong> Change a variable, make a prediction, then run the simulation."}
+function run(){
+ let v=values(),r=models[current].run(v);lastResult={model:current,values:v,result:r,time:new Date().toLocaleString()};
+ $("#runStatus").textContent="Running…";$("#predictionText").textContent="Simulation complete. Compare this with your prediction.";
+ if(current==="neuron")$(".signal")?.classList.add("run");
+ setTimeout(()=>{$("#runStatus").textContent="Complete";$("#metrics").innerHTML=r.metrics.map(x=>`<div class="metric"><span class="muted">${x[0]}</span><strong>${x[1]}</strong></div>`).join("");$("#explanation").innerHTML="<strong>"+r.title+".</strong> "+r.explanation; makeQuiz(v,r)},500);
+}
+function makeQuiz(v,r){quizState=models[current].question(v,r);$("#quizCard").innerHTML=`<h3>${quizState.q}</h3>${quizState.opts.map((o,i)=>`<button class="btn option" data-i="${i}">${o}</button>`).join("")}`;$$(".option").forEach(b=>b.onclick=()=>answer(+b.dataset.i))}
+function answer(i){if(!quizState)return;total++;let ok=i===quizState.ans;if(ok)score++;$("#score").textContent=`${score} / ${total}`;$$(".option").forEach((b,j)=>{b.disabled=true;if(j===quizState.ans)b.classList.add("correct");else if(j===i)b.classList.add("wrong")});toast(ok?"Correct — nice reasoning.":"Not quite. Read the explanation and try again.");}
+function choose(k){current=k;$("#process").value=k;renderControls();document.querySelector("#simulator").scrollIntoView({behavior:"smooth"});toast("Model loaded")}
+function save(){
+ if(!lastResult){toast("Run a simulation before saving.");return}
+ let a=storageGet();a.unshift(lastResult);if(!storageSet(a)){toast("Saving is unavailable; simulation still works.");return}renderSaved();toast("Experiment saved in this browser")}
+function renderSaved(){
+ let a=storageGet();$("#savedGrid").innerHTML=a.length?a.map((x,i)=>`<article class="card"><h3>${models[x.model].icon} ${models[x.model].name}</h3><p class="muted">${x.time}</p><p><b>${x.result.title}</b></p><button class="btn" onclick="loadSaved(${i})">Load</button> <button class="btn" onclick="deleteSaved(${i})">Delete</button></article>`).join(""):`<div class="empty">No saved experiments yet. Run a simulation and choose “Save”.</div>`;
+}
+function loadSaved(i){let x=storageGet()[i];choose(x.model);Object.entries(x.values).forEach(([k,v])=>{let e=$("#"+k);if(e){e.value=v;e.dispatchEvent(new Event("input"))}});lastResult=x;toast("Saved experiment loaded")}
+function deleteSaved(i){let a=storageGet();a.splice(i,1);storageSet(a);renderSaved()}
+function reset(){renderControls();$("#predictionText").textContent="Set the variables and predict the result."}
+$$("[data-scroll]").forEach(b=>b.onclick=()=>document.getElementById(b.dataset.scroll).scrollIntoView({behavior:"smooth"}));
+$("#topicSearch").oninput=e=>renderTopics(e.target.value);
+$("#process").onchange=e=>{current=e.target.value;renderControls()};
+$("#runBtn").onclick=run;$("#resetBtn").onclick=reset;$("#saveCurrent").onclick=save;$("#clearSaved").onclick=()=>{try{localStorage.removeItem("biolab_saved")}catch(e){}renderSaved();toast("Saved experiments cleared")};
+$("#revealBtn").onclick=()=>{if(lastResult){$("#explanation").innerHTML="<strong>"+lastResult.result.title+".</strong> "+lastResult.result.explanation;document.querySelector("#explanation").scrollIntoView({behavior:"smooth",block:"nearest"})}else toast("Run a simulation first.")};
+renderTopics();renderSelect();renderControls();renderSaved();makeQuiz(values(),models[current].run(values()));
+</script>
+</body>
+</html>
